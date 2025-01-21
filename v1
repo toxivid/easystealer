@@ -1,0 +1,96 @@
+@echo off
+color 0A
+
+:: Set the Downloads folder path
+set "downloads=%USERPROFILE%\Downloads"
+
+:: Check if Python is installed
+python --version >nul 2>&1
+if %errorlevel% neq 0 (
+    echo Python is not installed. Please install Python and ensure it is in the PATH.
+    pause
+    exit /b
+)
+
+:: Check if the "requests" module is installed
+python -c "import requests" >nul 2>&1
+if %errorlevel% neq 0 (
+    echo "requests" module not found. Installing it now...
+    pip install requests
+)
+
+:: Check if the "sigma" folder exists in Downloads
+if exist "%downloads%\sigma" (
+    echo Folder already exists
+) else (
+    mkdir "%downloads%\sigma"
+    echo Folder created
+)
+
+:: Create the Python script in a text file
+echo import requests > "%downloads%\sigma\script.py"
+echo import socket >> "%downloads%\sigma\script.py"
+echo import json >> "%downloads%\sigma\script.py"
+echo. >> "%downloads%\sigma\script.py"
+echo def get_public_ip(): >> "%downloads%\sigma\script.py"
+echo     try: >> "%downloads%\sigma\script.py"
+echo         response = requests.get('https://api.ipify.org?format=json') >> "%downloads%\sigma\script.py"
+echo         return response.json()['ip'] >> "%downloads%\sigma\script.py"
+echo     except Exception as e: >> "%downloads%\sigma\script.py"
+echo         return str(e) >> "%downloads%\sigma\script.py"
+echo. >> "%downloads%\sigma\script.py"
+echo def get_ip_info(ip): >> "%downloads%\sigma\script.py"
+echo     try: >> "%downloads%\sigma\script.py"
+echo         response = requests.get(f'http://ip-api.com/json/{ip}') >> "%downloads%\sigma\script.py"
+echo         return response.json() >> "%downloads%\sigma\script.py"
+echo     except Exception as e: >> "%downloads%\sigma\script.py"
+echo         return str(e) >> "%downloads%\sigma\script.py"
+echo. >> "%downloads%\sigma\script.py"
+echo def get_local_ip(): >> "%downloads%\sigma\script.py"
+echo     try: >> "%downloads%\sigma\script.py"
+echo         hostname = socket.gethostname() >> "%downloads%\sigma\script.py"
+echo         local_ip = socket.gethostbyname(hostname) >> "%downloads%\sigma\script.py"
+echo         return local_ip >> "%downloads%\sigma\script.py"
+echo     except Exception as e: >> "%downloads%\sigma\script.py"
+echo         return str(e) >> "%downloads%\sigma\script.py"
+echo. >> "%downloads%\sigma\script.py"
+echo def main(): >> "%downloads%\sigma\script.py"
+echo     public_ip = get_public_ip() >> "%downloads%\sigma\script.py"
+echo     ip_info = get_ip_info(public_ip) >> "%downloads%\sigma\script.py"
+echo     local_ip = get_local_ip() >> "%downloads%\sigma\script.py"
+echo. >> "%downloads%\sigma\script.py"
+echo     info = { >> "%downloads%\sigma\script.py"
+echo         'Public IP': public_ip, >> "%downloads%\sigma\script.py"
+echo         'Local IP': local_ip, >> "%downloads%\sigma\script.py"
+echo         'Country': ip_info.get('country', 'N/A'), >> "%downloads%\sigma\script.py"
+echo         'Region': ip_info.get('regionName', 'N/A'), >> "%downloads%\sigma\script.py"
+echo         'City': ip_info.get('city', 'N/A'), >> "%downloads%\sigma\script.py"
+echo         'ISP': ip_info.get('isp', 'N/A'), >> "%downloads%\sigma\script.py"
+echo         'Organization': ip_info.get('org', 'N/A'), >> "%downloads%\sigma\script.py"
+echo         'Timezone': ip_info.get('timezone', 'N/A'), >> "%downloads%\sigma\script.py"
+echo         'Latitude': ip_info.get('lat', 'N/A'), >> "%downloads%\sigma\script.py"
+echo         'Longitude': ip_info.get('lon', 'N/A'), >> "%downloads%\sigma\script.py"
+echo         'VPN Status': ip_info.get('proxy', 'N/A'), >> "%downloads%\sigma\script.py"
+echo         'AS': ip_info.get('as', 'N/A') >> "%downloads%\sigma\script.py"
+echo     } >> "%downloads%\sigma\script.py"
+echo. >> "%downloads%\sigma\script.py"
+echo     with open('user_info.txt', 'w') as file: >> "%downloads%\sigma\script.py"
+echo         for key, value in info.items(): >> "%downloads%\sigma\script.py"
+echo             file.write(f'{key}: {value}\n') >> "%downloads%\sigma\script.py"
+echo. >> "%downloads%\sigma\script.py"
+echo     print("Information has been saved to user_info.txt") >> "%downloads%\sigma\script.py"
+echo. >> "%downloads%\sigma\script.py"
+echo if __name__ == "__main__": >> "%downloads%\sigma\script.py"
+echo     main() >> "%downloads%\sigma\script.py"
+
+:: Wait for a very short time using ping (works as a tiny delay)
+ping -n 1 -w 1000 127.0.0.1 >nul
+
+:: Run the Python script
+python "%downloads%\sigma\script.py"
+
+:: Wait for 2 seconds before showing "Download completed"
+timeout /t 2 /nobreak >nul
+echo Download completed
+
+pause
